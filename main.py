@@ -160,7 +160,11 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"status": "Hold App работает ✅"}
+    return {
+        "status": "Hold App работает ✅",
+        "token_address": TOKEN_ADDRESS,
+        "min_balance": MIN_BALANCE
+    }
 
 @app.get("/api/user")
 async def get_user_stats(address: str):
