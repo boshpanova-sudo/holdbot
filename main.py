@@ -285,7 +285,7 @@ async def cmd_setup(message: Message):
         "Whale": CHAT_WHALE,
     }
     
-    result = "🔗 *Ссылки с одобрением заявок:*\n\n"
+    result = "🔗 Ссылки с одобрением заявок:\n\n"
     
     for name, chat_id in groups.items():
         if not chat_id:
@@ -296,11 +296,11 @@ async def cmd_setup(message: Message):
                 name=f"HoldApp {name}",
                 creates_join_request=True
             )
-            result += f"*{name}:*\n{link.invite_link}\n\n"
+            result += f"{name}:\n{link.invite_link}\n\n"
         except Exception as e:
-            result += f"*{name}:* ❌ Ошибка: {e}\n\n"
+            result += f"{name}: ❌ Ошибка: {e}\n\n"
     
-    await message.answer(result, parse_mode="Markdown")
+    await message.answer(result)
 
 @dp.chat_join_request()
 async def handle_join_request(request: ChatJoinRequest):
