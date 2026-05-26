@@ -273,6 +273,34 @@ async def cmd_help(message: Message):
         f"🐋 Whale — {WHALE_THRESHOLD:,}+ токенов",
         parse_mode="Markdown"
     )
+@dp.message(Command("setup"))
+async def cmd_setup(message: Message):
+    """Создаёт ссылки с одобрением для всех групп"""
+    groups = {
+        "Community": MAIN_GROUP_ID,
+        "7 Days": CHAT_7D,
+        "14 Days": CHAT_14D,
+        "21 Days": CHAT_21D,
+        "30 Days": CHAT_30D,
+        "Whale": CHAT_WHALE,
+    }
+    
+    result = "🔗 *Ссылки с одобрением заявок:*\n\n"
+    
+    for name, chat_id in groups.items():
+        if not chat_id:
+            continue
+        try:
+            link = await bot.create_chat_invite_link(
+                chat_id=int(chat_id),
+                name=f"HoldApp {name}",
+                creates_join_request=True
+            )
+            result += f"*{name}:*\n{link.invite_link}\n\n"
+        except Exception as e:
+            result += f"*{name}:* ❌ Ошибка: {e}\n\n"
+    
+    await message.answer(result, parse_mode="Markdown")
 
 @dp.chat_join_request()
 async def handle_join_request(request: ChatJoinRequest):
