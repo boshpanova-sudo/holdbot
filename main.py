@@ -53,16 +53,26 @@ async def init_db():
 # ─── TON API ─────────────────────────────────────────────
 async def get_jetton_balance(wallet_address: str) -> int:
     if not TOKEN_ADDRESS:
-        return 9999  # тестовый режим
+        return 696969
     try:
+        # Конвертируем raw адрес в friendly формат
+        clean_address = wallet_address.replace("0:", "").replace("-", "")
+        
         async with aiohttp.ClientSession() as session:
-            url = f"https://tonapi.io/v2/accounts/{wallet_address}/jettons/{TOKEN_ADDRESS}"
-            async with session.get(url) as resp:
+            # Пробуем через TONAPI
+            url = f"https://tonapi.io/v2/accounts/{wallet_address}/jettons"
+            headers = {"accept": "application/json"}
+            async with session.get(url, headers=headers) as resp:
                 if resp.status == 200:
                     data = await resp.json()
-                    balance  = int(data.get("balance", 0))
-                    decimals = data.get("jetton", {}).get("decimals", 9)
-                    return balance // (10 ** decimals)
+                    balances = data.get("balances", [])
+                    for item in balances:
+                        jetton = item.get("jetton", {})
+                        addr = jetton.get("address", "")
+                        if TOKEN_ADDRESS.lower() in addr.lower() or addr.lower() in TOKEN_ADDRESS.lower():
+                            balance = int(item.get("balance", 0))
+                            decimals = jetton.get("decimals", 9)
+                            return balance // (10 ** decimals)
     except Exception as e:
         logger.error(f"TON API ошибка: {e}")
     return 0
